@@ -4,6 +4,8 @@ import base64
 import numpy as np
 import cv2
 import tensorflow as tf
+# Force TensorFlow to use as little memory as possible
+tf.config.set_visible_devices([], 'GPU')
 import mediapipe as mp
 import requests
 import wave
@@ -14,6 +16,9 @@ from openai import OpenAI
 
 from dotenv import load_dotenv
 load_dotenv()
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # Suppress TF logs
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 
 # 1. INITIALIZE FLASK
 app = Flask(__name__)
@@ -52,9 +57,15 @@ def load_cnn():
     global cnn_model
     try:
         cnn_model = tf.keras.models.load_model(model_path, compile=False)
-        return "✅ CNN Texture Expert: Online (via tf.keras)"
+        if hasattr(cnn_model, 'optimizer'):
+            del cnn_model.optimizer
+            
+        return "✅ CNN Texture Expert: Online"
     except Exception as e:
-        return f"❌ CNN CRITICAL LOAD ERROR: {e}"
+        return f"❌ CNN CRITICAL LOAD ERROR: {e}"    
+    #     return "✅ CNN Texture Expert: Online (via tf.keras)"
+    # except Exception as e:
+    #     return f"❌ CNN CRITICAL LOAD ERROR: {e}"
 
 print(load_cnn())
 
