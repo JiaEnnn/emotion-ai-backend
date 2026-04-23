@@ -1,0 +1,9 @@
+flask
+flask-cors
+tensorflow-cpu
+mediapipe
+opencv-python-headless
+requests
+openai
+python-dotenv
+gunicorn
